@@ -1,4 +1,4 @@
-use drivers::{selection::Selection, weighted::Weighted};
+use drivers::{rng_table, selection::Selection, weighted::Weighted};
 use probability_drive::ThreadPool;
 use std::{
     io::prelude::*,
@@ -31,6 +31,7 @@ fn handle_connection(mut stream: TcpStream) {
     let get: &[u8; 16] = b"GET / HTTP/1.1\r\n";
     let weighted: &[u8; 29] = b"GET /weighted.json HTTP/1.1\r\n";
     let selection: &[u8; 30] = b"GET /selection.json HTTP/1.1\r\n";
+    let rng_table: &[u8; 30] = b"GET /rng_table.json HTTP/1.1\r\n";
 
     let (status_line, contents) = if buffer.starts_with(get) {
         ("HTTP/1.1 200 OK", root_response())
@@ -42,6 +43,16 @@ fn handle_connection(mut stream: TcpStream) {
         let selection_drive: Selection = Selection::new(10);
 
         ("HTTP/1.1 200 OK", selection_drive.to_json())
+    } else if buffer.starts_with(rng_table) {
+        let json: serde_json::Value = serde_json::json!({
+            "distribution": "uniform",
+            "values": rng_table::generate()
+        });
+
+        match ::serde_json::to_string_pretty(&json) {
+            Ok(value) => ("HTTP/1.1 200 OK", value),
+            Err(_) => ("HTTP/1.1 200 OK", json.to_string()),
+        }
     } else {
         ("HTTP/1.1 404 NOT FOUND", not_found_response())
     };

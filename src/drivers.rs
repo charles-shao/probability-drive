@@ -1,3 +1,7 @@
+pub mod rng_table;
+pub mod selection;
+pub mod weighted;
+
 const RARITY_CATEGORIES: [&str; 6] = [
     "Common",
     "Uncommon",
@@ -6,6 +10,3 @@ const RARITY_CATEGORIES: [&str; 6] = [
     "Exceptional",
     "Unique",
 ];
-
-pub mod selection;
-pub mod weighted;
