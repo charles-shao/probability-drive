@@ -1,4 +1,4 @@
-use drivers::weighted::Weighted;
+use drivers::{selection::Selection, weighted::Weighted};
 use probability_drive::ThreadPool;
 use std::{
     io::prelude::*,
@@ -29,14 +29,19 @@ fn handle_connection(mut stream: TcpStream) {
     stream.read(&mut buffer).unwrap();
 
     let get: &[u8; 16] = b"GET / HTTP/1.1\r\n";
-    let roll: &[u8; 25] = b"GET /roll.json HTTP/1.1\r\n";
+    let weighted: &[u8; 29] = b"GET /weighted.json HTTP/1.1\r\n";
+    let selection: &[u8; 30] = b"GET /selection.json HTTP/1.1\r\n";
 
     let (status_line, contents) = if buffer.starts_with(get) {
         ("HTTP/1.1 200 OK", root_response())
-    } else if buffer.starts_with(roll) {
+    } else if buffer.starts_with(weighted) {
         let weighted_drive: Weighted = Weighted::new(10);
 
         ("HTTP/1.1 200 OK", weighted_drive.to_json())
+    } else if buffer.starts_with(selection) {
+        let selection_drive: Selection = Selection::new(10);
+
+        ("HTTP/1.1 200 OK", selection_drive.to_json())
     } else {
         ("HTTP/1.1 404 NOT FOUND", not_found_response())
     };
@@ -60,5 +65,15 @@ fn not_found_response() -> String {
 }
 
 fn root_response() -> String {
-    drivers::weighted::chance_map_to_json()
+    let json: serde_json::Value = serde_json::json!({
+        "drivers": [
+            drivers::weighted::weight_map(),
+            drivers::selection::weight_map(),
+        ]
+    });
+
+    match ::serde_json::to_string_pretty(&json) {
+        Ok(value) => value,
+        Err(_) => json.to_string(),
+    }
 }

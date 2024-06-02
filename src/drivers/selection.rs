@@ -4,7 +4,7 @@ use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-pub const WEIGHTS: [i32; 6] = [600, 350, 100, 40, 9, 1];
+pub const WEIGHTS: [i32; 6] = [1, 1, 1, 1, 1, 1];
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WeightMap {
@@ -28,19 +28,21 @@ pub fn weight_map() -> serde_json::Value {
     })
 }
 
-pub struct Weighted {
+#[derive(Debug)]
+pub struct Selection {
     count: usize,
     generated_at: DateTime<Utc>,
     results: Vec<PullResult>,
     uuid: Uuid,
 }
 
+#[derive(Debug)]
 struct PullResult {
     name: &'static str,
 }
 
-impl Weighted {
-    pub fn new(count: usize) -> Weighted {
+impl Selection {
+    pub fn new(count: usize) -> Selection {
         assert!(count > 0);
 
         let uuid: Uuid = Uuid::now_v7();
@@ -55,7 +57,7 @@ impl Weighted {
             });
         }
 
-        Weighted {
+        Selection {
             count,
             generated_at,
             results,
