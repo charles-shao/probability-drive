@@ -32,7 +32,7 @@ fn handle_connection(mut stream: TcpStream) {
     let roll: &[u8; 25] = b"GET /roll.json HTTP/1.1\r\n";
 
     let (status_line, contents) = if buffer.starts_with(get) {
-        ("HTTP/1.1 200 OK", ok_response())
+        ("HTTP/1.1 200 OK", root_response())
     } else if buffer.starts_with(roll) {
         let weighted_drive: Weighted = Weighted::new(10);
 
@@ -59,10 +59,6 @@ fn not_found_response() -> String {
     json.to_string()
 }
 
-fn ok_response() -> String {
-    let json: serde_json::Value = serde_json::json!({
-        "status": "ok"
-    });
-
-    json.to_string()
+fn root_response() -> String {
+    drivers::weighted::chance_map_to_json()
 }
