@@ -1,4 +1,4 @@
-use drivers::{rng_table, selection::Selection, weighted::Weighted};
+use domain::{rng_table, weighted::Weighted};
 use probability_drive::ThreadPool;
 use std::{
     io::prelude::*,
@@ -7,7 +7,7 @@ use std::{
 
 use serde_json;
 
-mod drivers;
+mod domain;
 
 fn main() {
     let listener: TcpListener = TcpListener::bind("127.0.0.1:7878").unwrap();
@@ -30,7 +30,6 @@ fn handle_connection(mut stream: TcpStream) {
 
     let get: &[u8; 16] = b"GET / HTTP/1.1\r\n";
     let weighted: &[u8; 29] = b"GET /weighted.json HTTP/1.1\r\n";
-    let selection: &[u8; 30] = b"GET /selection.json HTTP/1.1\r\n";
     let rng_table: &[u8; 30] = b"GET /rng_table.json HTTP/1.1\r\n";
 
     let (status_line, contents) = if buffer.starts_with(get) {
@@ -39,10 +38,6 @@ fn handle_connection(mut stream: TcpStream) {
         let weighted_drive: Weighted = Weighted::new(10);
 
         ("HTTP/1.1 200 OK", weighted_drive.to_json())
-    } else if buffer.starts_with(selection) {
-        let selection_drive: Selection = Selection::new(10);
-
-        ("HTTP/1.1 200 OK", selection_drive.to_json())
     } else if buffer.starts_with(rng_table) {
         let json: serde_json::Value = serde_json::json!({
             "distribution": "uniform",
@@ -77,9 +72,8 @@ fn not_found_response() -> String {
 
 fn root_response() -> String {
     let json: serde_json::Value = serde_json::json!({
-        "drivers": [
-            drivers::weighted::weight_map(),
-            drivers::selection::weight_map(),
+        "domain": [
+            domain::weighted::weight_map(),
         ]
     });
 
