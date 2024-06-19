@@ -8,7 +8,7 @@ use super::Entity;
 
 pub const WEIGHTS: [i32; 6] = [600, 350, 100, 40, 9, 1];
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RarityCategory {
     Common,
     Uncommon,
@@ -71,6 +71,8 @@ pub struct Weighted {
 
 #[derive(Serialize, Deserialize)]
 struct PullResult {
+    // credit_eqiv: i32,
+    // duplicate: bool,
     entity: Entity,
     rarity_category: RarityCategory,
 }
@@ -94,11 +96,13 @@ impl Weighted {
                     }
                 };
 
-            // TODO: Figure out a default for no matches
-            let default_entities = Vec::<Entity>::with_capacity(0);
+            let empty_entities: Vec<Entity> = Vec::<Entity>::new();
             let entities: &Vec<Entity> = match super::ENTITY_PULL_DATA.get(&rarity_category) {
                 Some(entities) => entities,
-                None => &default_entities,
+                None => {
+                    println!("no entities for rarity {:?}", &rarity_category);
+                    &empty_entities
+                }
             };
 
             let weights: Vec<i32> = entities.iter().map(|entity| entity.weight as i32).collect();

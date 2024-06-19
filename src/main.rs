@@ -1,13 +1,14 @@
-use domain::{rng_table, weighted::Weighted};
+use draw::{result::Weighted, rng_table};
 use probability_drive::ThreadPool;
 use std::{
+    fs,
     io::prelude::*,
     net::{TcpListener, TcpStream},
 };
 
 use serde_json;
 
-mod domain;
+mod draw;
 
 fn main() {
     let listener: TcpListener = TcpListener::bind("127.0.0.1:7878").unwrap();
@@ -29,12 +30,13 @@ fn handle_connection(mut stream: TcpStream) {
     stream.read(&mut buffer).unwrap();
 
     let get: &[u8; 16] = b"GET / HTTP/1.1\r\n";
-    let weighted: &[u8; 29] = b"GET /weighted.json HTTP/1.1\r\n";
+    let get_result: &[u8; 27] = b"GET /result.json HTTP/1.1\r\n";
     let rng_table: &[u8; 30] = b"GET /rng_table.json HTTP/1.1\r\n";
+    let playground: &[u8; 26] = b"GET /playground HTTP/1.1\r\n";
 
     let (status_line, contents) = if buffer.starts_with(get) {
         ("HTTP/1.1 200 OK", root_response())
-    } else if buffer.starts_with(weighted) {
+    } else if buffer.starts_with(get_result) {
         let weighted_drive: Weighted = Weighted::new(10);
 
         ("HTTP/1.1 200 OK", weighted_drive.to_json())
@@ -48,6 +50,10 @@ fn handle_connection(mut stream: TcpStream) {
             Ok(value) => ("HTTP/1.1 200 OK", value),
             Err(_) => ("HTTP/1.1 200 OK", json.to_string()),
         }
+    } else if buffer.starts_with(playground) {
+        let contents = fs::read_to_string("index.html").unwrap();
+
+        ("HTTP/1.1 200 OK", contents)
     } else {
         ("HTTP/1.1 404 NOT FOUND", not_found_response())
     };
@@ -72,8 +78,8 @@ fn not_found_response() -> String {
 
 fn root_response() -> String {
     let json: serde_json::Value = serde_json::json!({
-        "domain": [
-            domain::weighted::weight_map(),
+        "draw": [
+            draw::result::weight_map(),
         ]
     });
 
