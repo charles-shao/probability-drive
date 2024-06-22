@@ -1,0 +1,105 @@
+html {
+  font-family: monospace;
+}
+
+body {
+  margin: 0px;
+  height: 100vh;
+  width: 100vw;
+}
+
+.layout-content-left {
+  grid-area: content-left;
+  margin: 1em;
+}
+.layout-content-right {
+  grid-area: content-right;
+  margin: 1em;
+}
+.layout-content-body {
+  background-color: aquamarine;
+  grid-area: content-body;
+  margin: 1em;
+}
+.layout {
+  display: grid;
+  grid-template-areas:
+    'content-left content-body content-right';
+  grid-template-columns: 25% 50% 25%;
+  height: 100%;
+  width: 100%;
+}
+
+.overlay-menu-tl {
+  background-color: rgba(255, 20, 145, 0.1);
+  grid-area: menu-tl;
+}
+.overlay-menu-tr {
+  background-color: rgba(255, 20, 145, 0.1);
+  grid-area: menu-tr;
+}
+.overlay-menu-bl {
+  background-color: rgba(255, 20, 145, 0.1);
+  grid-area: menu-bl;
+}
+.overlay-menu-br {
+  background-color: rgba(255, 20, 145, 0.1);
+  grid-area: menu-br;
+}
+.overlay-header {
+  background-color: transparent;
+  grid-area: header;
+}
+.overlay-body {
+  background-color: transparent;
+  grid-area: body;
+}
+.overlay-footer {
+  background-color: transparent;
+  grid-area: footer;
+}
+.overlay-layout {
+  display: grid;
+  grid-template-areas:
+    'menu-tl header menu-tr'
+    'body body body'
+    'menu-bl footer menu-br';
+  grid-template-columns: 25% 50% 25%;
+  grid-template-rows: 15% 70% 15%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+.pull-result {
+  border-width: thick;
+  border-style: solid;
+  margin: 1em;
+  padding: 1em;
+}
+.pull-entity-equipment {
+  border-style: dotted;
+}
+.pull-entity-operator {
+  border-style: solid;
+}
+.common {
+  border-color: white
+}
+.uncommon {
+  border-color: green
+}
+.rare {
+  border-color: blue;
+}
+.super-rare {
+  border-color: purple
+}
+.exceptional {
+  border-color: orange;
+}
+.unique {
+  border-color: orangered;
+}

@@ -40,30 +40,6 @@ pub struct WeightMap {
     weight: i32,
 }
 
-pub fn weight_map() -> serde_json::Value {
-    let mut weight_map: Vec<WeightMap> = Vec::with_capacity(6);
-
-    for i in 0..6 {
-        let rarity_category: RarityCategory = match RarityCategory::try_from(i) {
-            Ok(category) => category,
-            Err(_) => {
-                println!("out of bounds index {}", i);
-                RarityCategory::Common
-            }
-        };
-
-        weight_map.push(WeightMap {
-            rarity_category: rarity_category,
-            weight: WEIGHTS[i],
-        })
-    }
-
-    serde_json::json!({
-        "type": "weighted",
-        "mapping": weight_map,
-    })
-}
-
 pub struct Weighted {
     count: usize,
     results: Vec<PullResult>,

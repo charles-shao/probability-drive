@@ -21,7 +21,6 @@ enum EntityKind {
 }
 
 lazy_static! {
-    // TODO: stick this in a csv file
     static ref ENTITY_PULL_DATA: HashMap<RarityCategory, Vec<Entity>> = {
         let mut common_entities = Vec::<Entity>::with_capacity(7);
         common_entities.push(Entity {
